@@ -5,7 +5,7 @@ except Exception as e:
 
 import time
 import threading
-from raspberry_i2c.i2c_config import I2C_Config
+from Raspberry_i2c.i2c_config import I2C_Config
 
 
 def sign(a): return 1 - 2*(a < 0)
@@ -14,27 +14,32 @@ def sign(a): return 1 - 2*(a < 0)
 _busLock = threading.Lock()
 
 
-def BusLockWrapper(func):
-    def _wrapper(*args, **kwargs):
-        _busLock.acquire()
-        try:
-            return func(*args, **kwargs)
-        except IOError as err:
-            print(err)
-            return None
-        finally:
-            _busLock.release()
-            # time.sleep(0.001)
-    return _wrapper
-
-
-class Omegabot(I2C_Config):
+class Omegabot_I2C(I2C_Config):
 
     def __init__(self):
         self.log("I2C Bus Initialization - Start")
         self.bus = SMBus(1)
         time.sleep(0.1)
         self.log("I2C Bus Initialization - Done")
+
+    @staticmethod
+    def BusLockWrapper(func):
+        """wrapper to protect the I2C channel from errors
+
+        Args:
+            func (method): the method to wrap
+        """
+        def _wrapper(*args, **kwargs):
+            _busLock.acquire()
+            try:
+                return func(*args, **kwargs)
+            except IOError as err:
+                print(err)
+                return None
+            finally:
+                _busLock.release()
+                # time.sleep(0.001)
+        return _wrapper
 
     @staticmethod
     def log(msg): print(msg)
