@@ -5,7 +5,7 @@ except Exception as e:
 
 import time
 import threading
-from _Raspberry.I2C_Config import I2C_Config
+from raspberry_i2c.i2c_config import I2C_Config
 
 
 def sign(a): return 1 - 2*(a < 0)
