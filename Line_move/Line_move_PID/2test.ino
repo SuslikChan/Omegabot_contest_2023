@@ -33,7 +33,7 @@ void loop() {
 // Чтение значений с датчиков линии
  int leftSensorValue = analogRead(leftSensorPin);
  int rightSensorValue = analogRead(rightSensorPin);
- regulator1.input =leftSensorValue-rightSensorValue;//скармливаем левому регулятору значение левого датчика
+ regulator1.input =leftSensorValue-rightSensorValue;
  digitalWrite(L_ctrl,HIGH);
  digitalWrite(R_ctrl,HIGH);
  h = map(regulator1.getResultTimer(),0 ,255, 0 ,100);
@@ -49,4 +49,7 @@ void loop() {
   analogWrite(L_PWM,200);
   analogWrite(R_PWM,200);
  }
+ Serial.print(0);
+ Serial.print(',');
+ Serial.println(regulator1.getResultTimer());
  }
