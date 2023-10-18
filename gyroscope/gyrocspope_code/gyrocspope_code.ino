@@ -73,7 +73,7 @@ void loop()
 
     degrees = degrees + (speed_0+speed_1)/2*0.03;
     speed_0 = speed_1;
-    SERIAL_PORT.println(degrees);
+    SERIAL_PORT.println(millis());
     delay(30);
   }
   else
