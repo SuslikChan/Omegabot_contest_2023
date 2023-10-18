@@ -21,6 +21,7 @@ ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
 float degrees = 0.0;
 float speed_1;
 float speed_0 = 0.0;
+const float time = 0.032;
 void setup()
 {
 
@@ -71,9 +72,9 @@ void loop()
     speed_1 =  myICM.agmt.gyr.axes.z;
     if ((speed_1 < 100) and (speed_1 > -100)) speed_1 = 0;
 
-    degrees = degrees + (speed_0+speed_1)/2*0.03;
+    degrees = degrees + (speed_0+speed_1)/2*time;
     speed_0 = speed_1;
-    SERIAL_PORT.println(millis());
+    SERIAL_PORT.println(degrees);
     delay(30);
   }
   else
