@@ -18,11 +18,9 @@ ICM_20948_SPI myICM; // If using SPI create an ICM_20948_SPI object
 #else
 ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
 #endif
-float degrees;
+float degrees = 0.0;
 float speed_1;
 float speed_0 = 0.0;
-float count = 0.0;
-float sum = 0.0;
 void setup()
 {
 
@@ -70,12 +68,12 @@ void loop()
   if (myICM.dataReady())
   { 
     myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
-    sum = sum + myICM.agmt.gyr.axes.z;
-    count++;
+    speed_1 =  myICM.agmt.gyr.axes.z;
+    if ((speed_1 < 100) and (speed_1 > -100)) speed_1 = 0;
 
     degrees = degrees + (speed_0+speed_1)/2*0.03;
     speed_0 = speed_1;
-    SERIAL_PORT.println(sum/count);
+    SERIAL_PORT.println(degrees);
     delay(30);
   }
   else
