@@ -22,6 +22,7 @@ float degrees = 0.0;
 float speed_1;
 float speed_0 = 0.0;
 const float time = 0.032;
+const float k = 15.6;
 void setup()
 {
 
@@ -61,6 +62,26 @@ void setup()
       initialized = true;
     }
   }
+
+  ICM_20948_fss_t myFSS;
+  myFSS.g = dps2000; // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
+                    // dps250
+                    // dps500
+                    // dps1000
+                    // dps2000
+  myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
+  //ICM_20948_dlpcfg_t myDLPcfg;
+  //myDLPcfg.g = gyr_d361bw4_n376bw5; // (ICM_20948_GYRO_CONFIG_1_DLPCFG_e)
+                                    // gyr_d196bw6_n229bw8
+                                    // gyr_d151bw8_n187bw6
+                                    // gyr_d119bw5_n154bw3
+                                    // gyr_d51bw2_n73bw3
+                                    // gyr_d23bw9_n35bw9
+                                    // gyr_d11bw6_n17bw8
+                                    // gyr_d5bw7_n8bw9
+                                    // gyr_d361bw4_n376bw5
+
+  //myICM.setDLPFcfg((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myDLPcfg);
 }
 
 void loop()
@@ -68,19 +89,23 @@ void loop()
 
   if (myICM.dataReady())
   { 
-    myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
-    speed_1 =  myICM.agmt.gyr.axes.z;
-    if ((speed_1 < 100) and (speed_1 > -100)) speed_1 = 0;
-
-    degrees = degrees + (speed_0+speed_1)/2*time;
-    speed_0 = speed_1;
-    SERIAL_PORT.println(degrees);
+    degrees = get_degrees(degrees);
     delay(30);
   }
   else
   {
-    SERIAL_PORT.println("Waiting for data");
+    SERIAL_PORT.println("No data. Please wait");
     delay(500);
   }
 }
 
+float get_degrees(float degrees_0)
+{
+  myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
+  speed_1 =  myICM.agmt.gyr.axes.z;
+
+  degrees = degrees + (speed_0+speed_1)/2*time/k;
+  speed_0 = speed_1;
+  return degrees;
+
+}
