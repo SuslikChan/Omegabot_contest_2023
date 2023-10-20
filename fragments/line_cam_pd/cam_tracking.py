@@ -28,17 +28,20 @@ def get_trend(cnt, dy=100, img=None):
         x2 = x + vx*m
         y2 = y + vy*m
 
-        dx = line_tang * dy  # отклонение линии/пропорциональная ошибка
-        x_cross = y1-x1/line_tang  # Координата пересечения линии и низа кадра
-
+        rows = img.shape[0]
+        y_cross = y1-x1/line_tang
+        dx_frame = (rows-dy-y_cross)*line_tang
+        dx = dx_frame - img.shape[1]/2
         if not img is None:
-            cv.line(img, (int(x1), int(y1)), (int(x2), int(y2)),
-                    (0, 255, 0), 2)  # построение линии
-            cv.circle(img, (int(x), int(y)), 3, (255, 0, 0), 4)
-            # cv.circle(img, (int((rows-dy-b)*line_tang),
-            #                 int(rows-dy)), 3, (255, 0, 0), 4)
+            
+            
+            cv.line(img, (int(x1), int(y1)), 
+                    (int(x2), int(y2)),
+                    (0, 255, 0), 2) 
+            cv.circle(img, (int(dx_frame), int(rows-dy)),
+                      3, (255, 0, 0), 4)
 
-        return (dx, radians)
+        return (dx, -radians)
 
     # except Exception as e:
     #     print(e)
@@ -60,8 +63,8 @@ def PD_reg(Kp=1, Kd=0, d_x=0, dif_dx=0, norm_speed=200):
     """
 
     reaction = Kp*d_x + Kd*dif_dx  # настройка ПИД-регулятора
-    l_speed = norm_speed + reaction
-    r_speed = norm_speed - reaction
+    l_speed = int(norm_speed + reaction)
+    r_speed = int(norm_speed - reaction)
 
     return (l_speed, r_speed)
 
@@ -101,10 +104,13 @@ if __name__ == "__main__":
             
             contours = get_conturs(frame=frame)
             max_cnt = contour_selection(contours=contours)      
-            get_trend(cnt=max_cnt, dy=120, img=frame)
+            dx, radians = get_trend(cnt=max_cnt, dy=120, img=frame)
+            l_speed, r_speed = PD_reg(Kp=6, Kd=100, d_x=dx, dif_dx=radians, norm_speed=200)
+
+            print(l_speed, r_speed)
 
             cv.imshow("cam", frame)
-            k = cv.waitKey(5)
+            k = cv.waitKey(500)
             if k == ord('q') or k == 27:
                 break
         else:
