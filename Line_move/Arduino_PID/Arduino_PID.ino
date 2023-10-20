@@ -8,8 +8,8 @@
 
 #define NORMAL_SPEED 220
 
-const int leftSensorPin = A2;
-const int rightSensorPin = A1;
+#define L_SENS_PIN A2
+#define R_SENS_PIN A1
 
 GyverPID PID(0, 0, 0, 1);//подключаем регуляторы, ставим коэфы
 const int norm = 0;//приводим значение черной линии
@@ -40,8 +40,8 @@ void setup(){
   PID.setpoint=norm;// ставим значение, к которму будет стремиться регулятор
   Serial.begin(9600);
   // Настройка пинов датчиков линии как входов
-  pinMode(leftSensorPin, INPUT);
-  pinMode(rightSensorPin, INPUT);
+  pinMode(L_SENS_PIN, INPUT);
+  pinMode(R_SENS_PIN, INPUT);
   
   // Настройка пинов моторов как выходов
   pinMode(LM_PWM, OUTPUT);
@@ -57,8 +57,8 @@ void setup(){
 void loop() {
   
 // Чтение значений с датчиков линии
-    int leftSensorValue = analogRead(leftSensorPin);
-    int rightSensorValue = analogRead(rightSensorPin);
+    int leftSensorValue = analogRead(L_SENS_PIN);
+    int rightSensorValue = analogRead(R_SENS_PIN);
     int err =leftSensorValue-rightSensorValue;
 
     PID.input = err;
