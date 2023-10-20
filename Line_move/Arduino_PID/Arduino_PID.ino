@@ -1,4 +1,4 @@
-
+#include <GyverFilters.h>
 #include <GyverPID.h>
 
 #define RM_DIR  4   // Направление левого мотора
@@ -12,7 +12,9 @@
 #define R_SENS_PIN A1
 
 GyverPID PID(0, 0, 0, 1);//подключаем регуляторы, ставим коэфы
-const int norm = 0;//приводим значение черной линии
+const int norm = 0;
+
+GFilterRA filt;
 
 void SetSpeed(int pwm, uint8_t dir_pin, uint8_t pwm_pin){  // Установка скорости мотора
   bool dir = 0;                        // Состояние пина направления
@@ -53,12 +55,15 @@ void setup(){
   PID.Kp = 25;
   PID.Ki = 0;
   PID.Kd = 0.1;
+  //настройка фильтров
+  filt.setCoef(0.01);//установка коэффициента фильтрации (0.0... 1.0). Чем меньше, тем плавнее фильтр
+  filt.setStep(10);// установка шага фильтрации (мс). Чем меньше, тем резче фильтр
 }
 void loop() {
   
 // Чтение значений с датчиков линии
-    int leftSensorValue = analogRead(L_SENS_PIN);
-    int rightSensorValue = analogRead(R_SENS_PIN);
+    int leftSensorValue = filt.filteredTime(analogRead(L_SENS_PIN));
+    int rightSensorValue = filt.filteredTime(analogRead(R_SENS_PIN));
     int err =leftSensorValue-rightSensorValue;
 
     PID.input = err;
