@@ -89,18 +89,23 @@ void loop()
 
   if (myICM.dataReady())
   { 
-    myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
-    speed_1 =  myICM.agmt.gyr.axes.z;
-
-    degrees = degrees + (speed_0+speed_1)/2*time/k;
-    speed_0 = speed_1;
-    SERIAL_PORT.println(degrees);
+    degrees = get_degrees(degrees);
     delay(30);
   }
   else
   {
-    SERIAL_PORT.println("Waiting for data");
+    SERIAL_PORT.println("No data. Please wait");
     delay(500);
   }
 }
 
+float get_degrees(float degrees_0)
+{
+  myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
+  speed_1 =  myICM.agmt.gyr.axes.z;
+
+  degrees = degrees + (speed_0+speed_1)/2*time/k;
+  speed_0 = speed_1;
+  return degrees;
+
+}
