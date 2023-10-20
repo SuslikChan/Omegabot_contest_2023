@@ -3,17 +3,17 @@ import math
 
 
 def get_trend(cnt, dy=100, img=None):
-    """Получение отклонения и угла наклона линии
+        """Получение отклонения и угла наклона линии
 
-    Args:
-        cnt (_type_): _description_
-        dy (int, optional): _description_. Defaults to 100.
-        img (_type_, optional): _description_. Defaults to None.
+        Args:
+            cnt (_type_): _description_
+            dy (int, optional): _description_. Defaults to 100.
+            img (_type_, optional): _description_. Defaults to None.
 
-    Returns:
-        _type_: _description_
-    """
-    try:
+        Returns:
+            _type_: _description_
+        """
+        # try:
         # получение данных о прямой, всеченной в контур
         vx, vy, x, y = cv.fitLine(cnt, cv.DIST_L2, 0, 0.01, 0.01)
         vx, vy, x, y = vx[0], vy[0], x[0], y[0]
@@ -31,7 +31,7 @@ def get_trend(cnt, dy=100, img=None):
         dx = line_tang * dy  # отклонение линии/пропорциональная ошибка
         x_cross = y1-x1/line_tang  # Координата пересечения линии и низа кадра
 
-        if img != None:
+        if not img is None:
             cv.line(img, (int(x1), int(y1)), (int(x2), int(y2)),
                     (0, 255, 0), 2)  # построение линии
             cv.circle(img, (int(x), int(y)), 3, (255, 0, 0), 4)
@@ -40,9 +40,9 @@ def get_trend(cnt, dy=100, img=None):
 
         return (dx, radians)
 
-    except Exception as e:
-        print(e)
-        pass
+    # except Exception as e:
+    #     print(e)
+    #     pass
 
 
 def PD_reg(Kp=1, Kd=0, d_x=0, dif_dx=0, norm_speed=200):
@@ -81,26 +81,28 @@ def get_conturs(frame):
 
     return contours
 
+def contour_selection(contours = []):
+    max_ar = 0
+    max_cn = None
+    for cnt in contours:
+        area = cv.contourArea(cnt)
+        if area >= max_ar:
+            max_ar = area
+            max_cn = cnt
+    return max_cn
 
 if __name__ == "__main__":
 
     vid = cv.VideoCapture('output.avi')
+
     while (vid.isOpened()):
         ret, frame = vid.read()
         if (ret == True):
             
-            contours = get_conturs(frame)
+            contours = get_conturs(frame=frame)
+            max_cnt = contour_selection(contours=contours)      
+            get_trend(cnt=max_cnt, dy=120, img=frame)
 
-            max_ar = 0
-            max_cn = 0
-            for cnt in contours:
-                area = cv.contourArea(cnt)
-                if area >= max_ar:
-                    max_ar = area
-                    max_cn = cnt
-                    
-            du = get_trend(frame, max_cn)
-            print(du)
             cv.imshow("cam", frame)
             k = cv.waitKey(5)
             if k == ord('q') or k == 27:
