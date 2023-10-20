@@ -66,18 +66,31 @@ def PD_reg(Kp=1, Kd=0, d_x=0, dif_dx=0, norm_speed=200):
     return (l_speed, r_speed)
 
 
+def get_conturs(frame):
+    """_summary_
+
+    Args:
+        frame (_type_): _description_
+    """
+    gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    bin_frame = cv.threshold(gray_frame, 80, 255, 1)[1]
+    contours = cv.findContours(
+        bin_frame, cv.RETR_LIST,
+        cv.CHAIN_APPROX_SIMPLE)[0]
+    frame = cv.drawContours(frame, contours, -1, (0, 0, 255), 2)
+
+    return contours
+
+
 if __name__ == "__main__":
 
     vid = cv.VideoCapture('output.avi')
     while (vid.isOpened()):
         ret, frame = vid.read()
         if (ret == True):
-            gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            bin_frame = cv.threshold(gray_frame, 80, 255, 1)[1]
-            contours = cv.findContours(
-                bin_frame, cv.RETR_LIST,
-                cv.CHAIN_APPROX_SIMPLE)[0]
-            output = cv.drawContours(frame, contours, -1, (0, 0, 255), 2)
+            
+            contours = get_conturs(frame)
+
             max_ar = 0
             max_cn = 0
             for cnt in contours:
@@ -85,9 +98,10 @@ if __name__ == "__main__":
                 if area >= max_ar:
                     max_ar = area
                     max_cn = cnt
-            du = get_trend(output, max_cn)
+                    
+            du = get_trend(frame, max_cn)
             print(du)
-            cv.imshow("cam", output)
+            cv.imshow("cam", frame)
             k = cv.waitKey(5)
             if k == ord('q') or k == 27:
                 break
