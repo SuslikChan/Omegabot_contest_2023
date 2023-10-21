@@ -1,75 +1,42 @@
-#include <GyverFilters.h>
+#include "motors.h"
+#include "sensors.h"
 #include <GyverPID.h>
 
-#define RM_DIR  4   // Направление левого мотора
-#define RM_PWM  5   // ШИМ левого мотора
-#define LM_DIR  7   // Направление правого мотора
-#define LM_PWM  6   // ШИМ правого мотора
+#define NORMAL_SPEED 255
+#define PID_TIMER 10
+#define KP 6
+#define KD 0.3
+#define KI 0
+#define NORM_PID 0
 
-#define NORMAL_SPEED 220
+GyverPID PID(0, 0, 0, PID_TIMER);
 
-#define L_SENS_PIN A2
-#define R_SENS_PIN A1
-
-GyverPID PID(0, 0, 0, 1);//подключаем регуляторы, ставим коэфы
-const int norm = 0;
-
-GFilterRA filt;
-
-void SetSpeed(int pwm, uint8_t dir_pin, uint8_t pwm_pin){  // Установка скорости мотора
-  bool dir = 0;                        // Состояние пина направления
-  if (pwm > 0) dir = 1;                // Движение прямо                          
-  if (abs(pwm) > 255) pwm = 255;       // Ограничение скорости 
-
-  digitalWrite(dir_pin, dir);     // Направление
-  analogWrite(pwm_pin, abs(pwm)); // Скорость
-} 
-void SetLSpeed(int speed){                         // Установка скорости левого мотора
-  SetSpeed(speed, LM_DIR, LM_PWM);
+void InitPID(){
+  PID.setDirection(NORMAL);// ставим "направление" регулятора- NORMAL=>выход регулятора напрямую влияет на датчик
+  PID.setpoint = NORM_PID;// ставим значение, к которму будет стремиться регулятор
+  PID.setLimits(-NORMAL_SPEED*2, NORMAL_SPEED*2); 
+  PID.Kp = KP;
+  PID.Ki = KI;
+  PID.Kd = KD;
 }
-void SetRSpeed(int speed){                         // Установка скорости правого мотора
-  SetSpeed(speed, RM_DIR, RM_PWM);
-}
-void SetTankSpeed(int L_speed, int R_speed){       // Установка скорости для двух моторов
-  SetLSpeed(L_speed);
-  SetRSpeed(R_speed);
-  Serial.println(String(L_speed) + "  " + String(R_speed));
-}
-
 
 void setup(){
-  PID.setDirection(NORMAL);// ставим "направление" регулятора- NORMAL=>выход регулятора напрямую влияет на датчик
-  PID.setpoint=norm;// ставим значение, к которму будет стремиться регулятор
+
   Serial.begin(9600);
-  // Настройка пинов датчиков линии как входов
-  pinMode(L_SENS_PIN, INPUT);
-  pinMode(R_SENS_PIN, INPUT);
-  
-  // Настройка пинов моторов как выходов
-  pinMode(LM_PWM, OUTPUT);
-  pinMode(LM_DIR, OUTPUT);
-  pinMode(RM_PWM, OUTPUT);
-  pinMode(RM_DIR, OUTPUT);
- //настройка коэф
-  PID.setLimits(-255, 255); 
-  PID.Kp = 25;
-  PID.Ki = 0;
-  PID.Kd = 0.1;
-  //настройка фильтров
-  filt.setCoef(0.01);//установка коэффициента фильтрации (0.0... 1.0). Чем меньше, тем плавнее фильтр
-  filt.setStep(10);// установка шага фильтрации (мс). Чем меньше, тем резче фильтр
+
+  InitMotors();
+  init_filters();
+  InitPID();
+  sensor_calibration();
+
 }
+
+
 void loop() {
-  
-// Чтение значений с датчиков линии
-    int leftSensorValue = filt.filteredTime(analogRead(L_SENS_PIN));
-    int rightSensorValue = filt.filteredTime(analogRead(R_SENS_PIN));
-    int err =leftSensorValue-rightSensorValue;
-
-    PID.input = err;
-
+    PID.input = get_error();
     int pid_ret = PID.getResultTimer();
-    SetTankSpeed(NORMAL_SPEED + pid_ret, NORMAL_SPEED - pid_ret);
 
-    //Serial.println("0," + String(err));
+    int l_speed = NORMAL_SPEED + pid_ret;
+    int r_speed = NORMAL_SPEED - pid_ret;
+    SetTankSpeed(l_speed, r_speed);
  }
