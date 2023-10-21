@@ -33,7 +33,24 @@ void setup(){
 
 
 void loop() {
-    PID.input = get_error();
+    if ((digitalRead(BUT_PIN)==1)&(flag==0)){
+      R_F_Black = analogRead(R_SENS_PIN);
+      L_F_Black = analogRead(L_SENS_PIN);
+      flag++;
+    }
+    if ((digitalRead(BUT_PIN)==1)&(flag==1)){
+      R_F_White = analogRead(R_SENS_PIN);
+      L_F_White = analogRead(L_SENS_PIN);
+      flag++;
+    }
+  
+// Чтение значений с датчиков линии
+    int leftSensorValue = filt.filteredTime(map(analogRead(L_SENS_PIN),L_F_White,L_F_Black,0,1023));
+    int rightSensorValue = filt.filteredTime(map(analogRead(R_SENS_PIN),R_F_White,R_F_Black,0,1023));
+    int err =leftSensorValue-rightSensorValue;
+
+    PID.input = err;
+
     int pid_ret = PID.getResultTimer();
 
     int l_speed = NORMAL_SPEED + pid_ret;
