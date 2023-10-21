@@ -3,6 +3,8 @@
 
 #define SENS_PIN A0 
 
+//1111
+
 Servo servo1;     // Инициализация Серв
 Servo servo2;     // 
 #define b1 11     // Кнопка
