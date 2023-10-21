@@ -11,6 +11,13 @@
 #define L_SENS_PIN A2
 #define R_SENS_PIN A1
 
+#define BUT_PIN 3
+bool flag = 0;
+int R_F_Black;
+int R_F_White;
+int L_F_Black;
+int L_F_White;
+
 GyverPID PID(0, 0, 0, 1);//подключаем регуляторы, ставим коэфы
 const int norm = 0;
 
@@ -44,6 +51,8 @@ void setup(){
   // Настройка пинов датчиков линии как входов
   pinMode(L_SENS_PIN, INPUT);
   pinMode(R_SENS_PIN, INPUT);
+  // настройка кнопки 
+  pinMode(BUT_PIN, INPUT_PULLUP);
   
   // Настройка пинов моторов как выходов
   pinMode(LM_PWM, OUTPUT);
@@ -60,10 +69,20 @@ void setup(){
   filt.setStep(10);// установка шага фильтрации (мс). Чем меньше, тем резче фильтр
 }
 void loop() {
+    if ((digitalRead(BUT_PIN)==1)&(flag==0)){
+      R_F_Black = analogRead(R_SENS_PIN);
+      L_F_Black = analogRead(L_SENS_PIN);
+      flag++;
+    }
+    if ((digitalRead(BUT_PIN)==1)&(flag==1)){
+      R_F_White = analogRead(R_SENS_PIN);
+      L_F_White = analogRead(L_SENS_PIN);
+      flag++;
+    }
   
 // Чтение значений с датчиков линии
-    int leftSensorValue = filt.filteredTime(analogRead(L_SENS_PIN));
-    int rightSensorValue = filt.filteredTime(analogRead(R_SENS_PIN));
+    int leftSensorValue = filt.filteredTime(map(analogRead(L_SENS_PIN),L_F_White,L_F_Black,0,1023));
+    int rightSensorValue = filt.filteredTime(map(analogRead(R_SENS_PIN),R_F_White,R_F_Black,0,1023));
     int err =leftSensorValue-rightSensorValue;
 
     PID.input = err;
