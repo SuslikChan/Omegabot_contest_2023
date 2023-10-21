@@ -14,8 +14,8 @@ const int R_ctrl = 4;
 
 #define PIN_TRIG 3
 #define PIN_ECHO 2
-  GyverPID regulator1(0, 0, 0,10);//подключаем регуляторы, ставим коэфы
-  GyverPID regulator2(0, 0, 0,10);
+  GyverPID regulator1(0, 0, 0, 10);//подключаем регуляторы, ставим коэфы
+  GyverPID regulator2(0, 0, 0, 10);
 long duration, cm;
 const int black = 800;//приводим значение черной линии
 void setup() {
