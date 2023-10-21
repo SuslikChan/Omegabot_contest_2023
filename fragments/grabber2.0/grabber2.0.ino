@@ -1,4 +1,4 @@
-#include <GyverPID.h>
+#include <GyverPID.h> //1234567
 #include <ServoSmooth.h>
 
 #define SENS_PIN A0     // Инфракрасник
