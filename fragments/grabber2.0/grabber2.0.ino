@@ -1,4 +1,4 @@
-#include <GyverPID.h> //1234567
+#include <GyverPID.h>
 #include <ServoSmooth.h>
 
 #define SENS_PIN A0     // Инфракрасник
@@ -8,14 +8,14 @@
 int moveSpd = 100;      // Обычная скорость
 int slowSpd = 60;       // Скорость при замедлении
 
-int openAng = 35;       // Угол захвата
-int closeAng = 110;     // Угол отпуска
+int openAng = 50;       // Угол захвата
+int closeAng = 180;     // Угол отпуска
 int grabDelay = 100;    // Время замедления
 
 ServoSmooth servos[AMOUNT];
 uint32_t servoTimer;
 uint32_t turnTimer;
-int position1 = 60;   // первое положение сервы 1 (вверх-вниз)
+int position1 = 15;   // первое положение сервы 1 (вверх-вниз)
 int position2 = 0;  // второе положение сервы 1 (вверх-вниз)
 
 bool flag;
@@ -41,28 +41,32 @@ void pick_up() {        // Взять предмет
     delay(300);
     servos[1].setTargetDeg(position1);  // До куда поднять 
     flag = true;                        // Начало подъёма
+    Serial.println("Smooooth");
   while (flag) {
     // каждые 20 мс
     if (millis() - servoTimer >= 20) {  // взводим таймер на 20 мс (как в библиотеке)
       servoTimer += 20;
         servos[1].tickManual();         // двигаем серву 1
+        Serial.println(millis() - servoTimer);
     } 
-    else !flag;                         // Конец подъёма
+    else flag = !flag;                         // Конец подъёма
   }   
 }
 
 void place_down() {     // Опустить предмет
   servos[1].setTargetDeg(position2);
   flag = true; 
+  Serial.println("Smooooth3");
   while (flag) {
     // каждые 20 мс
     if (millis() - servoTimer >= 20) {  // взводим таймер на 20 мс (как в библиотеке)
       servoTimer += 20;
         servos[1].tickManual();         // двигаем серву 1
+        Serial.println(millis() - servoTimer);
     } 
-    else !flag;
+    else flag = !flag;  
 }
-  delay(300); 
+  //delay(300); 
   servos[0].write(closeAng);            // Отпускаем банку
 }
 
@@ -77,12 +81,11 @@ void setup() {
   pinMode(L_ctrl, OUTPUT);
   pinMode(R_PWM, OUTPUT);
   pinMode(R_ctrl, OUTPUT);
-  servos[0].attach(3);
-  servos[1].attach(2);     
+  servos[0].attach(9);
+  servos[1].attach(10);     
   servos[0].setSpeed(360);
-  servos[1].setAccel(0.5);
-  servos[1].setSpeed(180);
-  servos[0].setAccel(0.5); 
+  servos[1].setSpeed(20);
+  servos[1].setAccel(0.1);
   servos[0].write(closeAng);        //  Начальное положение Серв
   servos[1].write(position2);       //
   pinMode(SENS_PIN, INPUT);
@@ -108,7 +111,7 @@ void loop() {
 
     pick_up();
     delay(2000);
-    place_down();
+    //place_down();
 
     jam_bot();
   }
