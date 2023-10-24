@@ -7,5 +7,4 @@
 
 
 
-void turnRight(int angle);
-void turnLeft(int angle);
+void turn(int angle);
