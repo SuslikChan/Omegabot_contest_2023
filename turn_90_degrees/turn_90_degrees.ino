@@ -9,5 +9,5 @@ void setup()
 
 void loop()
 {
-  turnLeft(90);
+  turn(90);
 }
