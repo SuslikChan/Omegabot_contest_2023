@@ -1,5 +1,4 @@
-#include "gyro.h"
-#include "motors.h"
+#include "turn.h"
 
 
 void setup()
@@ -10,19 +9,5 @@ void setup()
 
 void loop()
 {
-  turnLeft();
+  turnLeft(90);
 }
-
-
-void turnLeft(){
-  fuck_angls();
-  long int time_0 = millis();
-  float degrees;
-  while (degrees > -90){
-    degrees, time_0 = get_degrees(degrees, time_0);
-    SetTankSpeed(-150, 150);  
-  }
-  SetTankSpeed(0,0);
-}
-
-
