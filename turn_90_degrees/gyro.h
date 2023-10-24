@@ -13,4 +13,3 @@
 
 void initGyro();
 float get_degrees(float degrees_0, long int times);
-void fuck_angls();
