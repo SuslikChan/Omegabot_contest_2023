@@ -1,4 +1,4 @@
-lst = [4, 1, 3, 5, 6, 2]        # Input list of stops in route
+lst = [3, 5]        # Input list of stops in route
 
 lst3 = [-3, -4, -5]             # Non-Duplicate values
 
@@ -14,6 +14,10 @@ lst_out = []                    # Output list of actions
 
 Start = lst[0]                  # First stop in route
 Finish = lst[-1]                # Last stop in route
+
+def add_path(lst1):          # Add a path to the output list
+    for i in range(0, len(lst1)): 
+        lst_out.append(lst1[i]) 
 
 cmd_S = list(S1)
 if Start > 3:
@@ -36,10 +40,8 @@ else:
     while Finish > 1:
         cmd_F.insert(5, 5)
         Finish -= 1
-
+    
 add_path(cmd_S)
-
-lst_out.append(cmd_S)  # Add the start path to the output list
 
 for i in range(1, len(lst)):          # Iterate from the 2nd to the last element of lst
     n = lst[i-1] - lst[i]             # Get the difference between each pair of consecutive stops (path ID)                
@@ -78,7 +80,7 @@ for i in range(1, len(lst)):          # Iterate from the 2nd to the last element
 for b in range(0, len(lst_paths)):   # Iterate through lst_paths
     cmd = lst_paths[b]               # Get the current path
     if cmd == 10:  # Check for path №10
-        lst_out.append(cmd1)
+        add_path(cmd1)
     else:  # Sort out the other paths by adding the unique elements to the common part
         cmd_temp = list(cmd2)
         if cmd == 20 or cmd == 60:
@@ -95,8 +97,8 @@ for b in range(0, len(lst_paths)):   # Iterate through lst_paths
             cmd_temp.insert(6, 3)
         if cmd > 50:
             cmd_temp.insert(5, 5)
-        lst_out.append(cmd_temp)
+        add_path(cmd_temp)
+add_path(cmd_F)  # Add the finish path to the paths list
 
-lst_out.append(cmd_F)  # Add the finish path to the output list
-        
+print(len(lst_out))
 print(lst_out)
