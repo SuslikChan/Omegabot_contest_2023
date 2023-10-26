@@ -1,4 +1,4 @@
-lst = [3, 5]        # Input list of stops in route
+lst = [1, 5]        # Input list of stops in route
 
 lst3 = [-3, -4, -5]             # Non-Duplicate values
 
@@ -6,9 +6,9 @@ dict1 = {-3:10, -4:20, -5:60}   # Corresponding paths
 lst_paths = []                  # List of Paths in the route
 
 cmd1 = [1, 7, 5, 6]             # Path №10
-cmd2 = [1, 7, 4, 7, 4, 7, 6]    # Common part of paths №20-90
+cmd2 = [1, 7, 4, 7, 6]    # Common part of paths №20-90
 S1 = [0, 4, 3, 7, 6]            # Starting Path
-F1 = [1, 7, 4, 2, 7, 8]         # Finishing Path
+F1 = [1, 2, 7, 8]         # Finishing Path
 
 lst_out = []                    # Output list of actions
 
@@ -32,15 +32,15 @@ else:
 
 cmd_F = list(F1)
 if Finish > 3:
-    cmd_F[3] = 3
+    cmd_F[1] = 3
     while Finish > 4:
-        cmd_F.insert(5, 5)
+        cmd_F.insert(3, 5)
         Finish -= 1
 else:
     while Finish > 1:
-        cmd_F.insert(5, 5)
+        cmd_F.insert(3, 5)
         Finish -= 1
-    
+
 add_path(cmd_S)
 
 for i in range(1, len(lst)):          # Iterate from the 2nd to the last element of lst
@@ -84,21 +84,20 @@ for b in range(0, len(lst_paths)):   # Iterate through lst_paths
     else:  # Sort out the other paths by adding the unique elements to the common part
         cmd_temp = list(cmd2)
         if cmd == 20 or cmd == 60:
-            cmd_temp.insert(3, 3)
-            cmd_temp.insert(6, 2)
+            cmd_temp.insert(1, 3)
+            cmd_temp.insert(4, 2)
         elif cmd == 30 or cmd == 80:
-            cmd_temp.insert(3, 3)
-            cmd_temp.insert(6, 3)
+            cmd_temp.insert(1, 3)
+            cmd_temp.insert(4, 3)
         elif cmd == 40 or cmd == 90:
-            cmd_temp.insert(3, 2)
-            cmd_temp.insert(6, 2)
+            cmd_temp.insert(1, 2)
+            cmd_temp.insert(4, 2)
         elif cmd == 50 or cmd == 70:
-            cmd_temp.insert(3, 2)
-            cmd_temp.insert(6, 3)
+            cmd_temp.insert(1, 2)
+            cmd_temp.insert(4, 3)
         if cmd > 50:
-            cmd_temp.insert(5, 5)
+            cmd_temp.insert(3, 5)
         add_path(cmd_temp)
 add_path(cmd_F)  # Add the finish path to the paths list
 
-print(len(lst_out))
 print(lst_out)
