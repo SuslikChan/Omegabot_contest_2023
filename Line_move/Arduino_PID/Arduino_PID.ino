@@ -4,9 +4,9 @@
 
 #define NORMAL_SPEED 255
 #define PID_TIMER 10
-#define KP 4,9
-#define KD 0.3
-#define KI 0.1
+#define KP 3
+#define KD 0.35
+#define KI 0.35
 #define NORM_PID 0
 
 GyverPID PID(0, 0, 0, PID_TIMER);
